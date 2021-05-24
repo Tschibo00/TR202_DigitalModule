@@ -10,7 +10,6 @@ static uint8_t snappiness;
 static int32_t toneamp;
 static int32_t ampdesc;
 static int32_t accent;
-static int16_t overdrive;
 
 static int32_t cnt;
 static int32_t amp;
@@ -87,13 +86,7 @@ ISR(TIMER1_COMPA_vect){//timer 1 interrupt
 
 //  OCR0B=(amp*(reg&255))>>15;
 //  OCR0B=(amp*((reg&255)+(sinetable[cnt]*toneamp>>10)))>>15;
-  int32_t val=(amp*((reg&255)+(sinetable[(cnt>>8)&1023]*toneamp>>10)))>>15;
-//  val=((val*overdrive)>>8)+128-(overdrive>>1);
-val=(val*overdrive)>>8;
-
-
-
-  OCR0B=val<0?0:(val>255?255:val);
+  OCR0B=(amp*((reg&255)+(sinetable[(cnt>>8)&1023]*toneamp>>10)))>>15;
   cnt+=tonefreq;
 }
 
@@ -109,7 +102,6 @@ ISR(TIMER2_COMPA_vect) {
     toneamp=((int32_t)analogRead(A2));
     ampdesc=(525-((int32_t)analogRead(A3))/2)*(400-snappiness)/400;
     accent=analogRead(A4)<<5;
-    overdrive=analogRead(A5)+256;
   }
 //accent=10000;
   samp-=ampdesc;
